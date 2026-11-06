@@ -90,3 +90,83 @@ export type TaskState<T> =
   | { status: 'done'; result: T }
   | { status: 'cancelled' }
   | { status: 'error'; message: string };
+
+// ---- Epidemic domain types (see MODEL.md). User-facing quantities are R0 and days; internal rates are per day.
+
+/** Which compartmental model is being run. */
+export type ModelKind = 'SIR' | 'SEIR' | 'SEIRV';
+
+/** Compartment names. E is unused (always 0) in SIR; V is unused (always 0) without vaccination. */
+export type Compartment = 'S' | 'E' | 'I' | 'R' | 'V';
+
+/** Everything the user can set about the disease and the population (user-facing units). */
+export interface UserParams {
+  model: ModelKind;
+  /** Basic reproduction number R0 (dimensionless): infections caused by one case in a fully susceptible population. */
+  r0: number;
+  /** Mean incubation period in days (E -> I). Ignored for SIR. */
+  incubationDays: number;
+  /** Mean infectious period in days (I -> R). */
+  infectiousDays: number;
+  /** Total population N (people). */
+  population: number;
+  /** People infectious at day 0 (placed in I). */
+  initialInfected: number;
+  /** Vaccine efficacy against infection in [0, 1] (leaky vaccine). Only used by SEIRV. */
+  vaccineEfficacy: number;
+  /** Length of the simulation in days. */
+  horizonDays: number;
+}
+
+/** Internal per-day rates derived from UserParams by src/sim/params.ts (the only place that converts). */
+export interface InternalParams {
+  /** Transmission rate beta = R0 * gamma (per day). */
+  betaPerDay: number;
+  /** Progression rate sigma = 1 / incubation days (per day); null for SIR. */
+  sigmaPerDay: number | null;
+  /** Recovery rate gamma = 1 / infectious days (per day). */
+  gammaPerDay: number;
+}
+
+/** A timed change to the epidemic. Days are measured from day 0; the event is active on [startDay, endDay). */
+export type Intervention =
+  | {
+      type: 'contact_reduction';
+      startDay: number;
+      endDay: number;
+      /** Fraction of contacts removed, in [0, 1]; 0.4 means contacts drop by 40%. */
+      strength: number;
+    }
+  | {
+      type: 'vaccination';
+      startDay: number;
+      endDay: number;
+      /** Fraction of the currently susceptible population vaccinated per day, in [0, 1]. */
+      strength: number;
+    };
+
+/** A stretch of time over which all rates are constant. */
+export interface ScheduleSegment {
+  startDay: number;
+  endDay: number;
+  /** Product of (1 - strength) over active contact reductions; 1 means no reduction. */
+  contactMultiplier: number;
+  /** Sum of active vaccination rates (per day). */
+  vaccinationRatePerDay: number;
+}
+
+/** Deterministic solution sampled on an output grid. All arrays have the same length. */
+export interface Trajectory {
+  times: Float64Array;
+  S: Float64Array;
+  E: Float64Array;
+  I: Float64Array;
+  R: Float64Array;
+  V: Float64Array;
+  /** Cumulative infections since day 0 (including the initial infected). */
+  cumInfections: Float64Array;
+  /** Cumulative entries into I (symptom-onset-like flow, sigma*E for SEIR; equals infections for SIR). */
+  cumOnsets: Float64Array;
+  /** Cumulative vaccinations of susceptibles. */
+  cumVaccinated: Float64Array;
+}

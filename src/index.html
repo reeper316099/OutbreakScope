@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OutbreakScope</title>
+    <link rel="stylesheet" href="./styles/tokens.css" />
+    <link rel="stylesheet" href="./styles/base.css" />
+    <link rel="stylesheet" href="./styles/components.css" />
+  </head>
+  <body>
+    <div class="banner" role="note" id="disclaimer">
+      Teaching model, not a forecast. Simplified assumptions; do not use for public-health
+      decisions.
+    </div>
+    <header class="topbar"><h1>OutbreakScope</h1></header>
+    <div class="layout">
+      <nav class="rail" aria-label="Views" id="rail"></nav>
+      <main id="views">
+        <section id="view-simulator" data-view="simulator" aria-labelledby="h-simulator">
+          <h2 id="h-simulator">Simulator</h2>
+          <p class="muted">Scenario mode arrives in Phase 4. This is the empty shell.</p>
+          <div class="card">
+            <h3>Shell self-checks</h3>
+            <ul class="checks" id="checks"></ul>
+          </div>
+        </section>
+        <section id="view-explainer" data-view="explainer" hidden aria-labelledby="h-explainer">
+          <h2 id="h-explainer">How this works</h2>
+          <p class="muted">Coming in Phase 4.</p>
+        </section>
+        <section id="view-fit" data-view="fit" hidden aria-labelledby="h-fit">
+          <h2 id="h-fit">Fit to data</h2>
+          <p class="muted">Coming in Phase 5.</p>
+        </section>
+        <section id="view-about" data-view="about" hidden aria-labelledby="h-about">
+          <h2 id="h-about">About</h2>
+          <p class="muted" id="about-info"></p>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

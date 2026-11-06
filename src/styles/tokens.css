@@ -1,0 +1,32 @@
+/* Design tokens. Compartment colours are the Okabe-Ito palette (Okabe & Ito 2008), published as colour-blind safe. */
+:root {
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #eef1f7;
+  --text: #14213d;
+  --text-muted: #4a5568;
+  --border: #d5dbe6;
+  --primary: #14213d;
+  --primary-accent: #1f4e8c;
+  --secondary: #14b8a6;
+  --accent: #ff6b5b;
+  --shadow: 0 1px 3px rgb(20 33 61 / 12%), 0 4px 14px rgb(20 33 61 / 8%);
+  --radius: 14px;
+  --c-S: #0072b2;
+  --c-E: #e69f00;
+  --c-I: #d55e00;
+  --c-R: #009e73;
+  --c-V: #cc79a7;
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+[data-theme='dark'] {
+  --bg: #0e1524;
+  --surface: #172033;
+  --surface-2: #1f2a40;
+  --text: #e8edf7;
+  --text-muted: #a9b4c8;
+  --border: #2d3a54;
+  --primary-accent: #6aa8ff;
+  --shadow: 0 1px 3px rgb(0 0 0 / 40%), 0 4px 14px rgb(0 0 0 / 30%);
+}

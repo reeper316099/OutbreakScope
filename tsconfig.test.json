@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": { "lib": ["ES2023"], "types": ["node"] },
+  "include": [
+    "tests/**/*.ts",
+    "src/sim/**/*.ts",
+    "src/io/**/*.ts",
+    "src/shared/**/*.ts",
+    "electron/allowlist.ts",
+    "electron/appPath.ts"
+  ]
+}

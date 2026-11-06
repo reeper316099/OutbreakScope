@@ -1,0 +1,41 @@
+{
+  "name": "outbreakscope",
+  "version": "0.1.0",
+  "description": "Interactive infectious-disease outbreak simulator (teaching models, not forecasts)",
+  "author": "reeper316099",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "dist": "npm run build && electron-builder",
+    "typecheck": "tsc --noEmit -p tsconfig.renderer.json && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.worker.json && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:e2e": "npm run build && playwright test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "ref:generate": "python3 tools/gen_reference.py"
+  },
+  "dependencies": {
+    "chart.js": "4.6.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.65.0",
+    "@types/node": "24.19.2",
+    "@vitest/coverage-v8": "5.1.0",
+    "electron": "45.2.3",
+    "electron-builder": "26.18.0",
+    "electron-vite": "6.0.0",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vite": "8.3.6",
+    "vitest": "5.1.0"
+  }
+}

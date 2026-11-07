@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadPreferences, savePreferences } from '../../src/io/storage';
-import { csvHeader, deterministicCsv } from '../../src/io/export';
+import { csvHeader, deterministicCsv, ensembleCsv, fitCsv } from '../../src/io/export';
 import { parseScenarioFile, serializeScenario } from '../../src/io/session';
 import type { Scenario } from '../../src/shared/types';
 import { runScenario } from '../../src/sim/scenario';
@@ -55,6 +55,67 @@ describe('CSV export', () => {
     expect(lines.slice(header + 1).length).toBe(31);
     expect(lines[header + 1]?.split(',')[0]).toBe('0');
     expect(lines[lines.length - 1]?.split(',').length).toBe(9);
+  });
+});
+
+describe('ensemble and fit CSV exports', () => {
+  it('ensemble CSV has the header (seed, method) and one row per day with the band columns', () => {
+    const times = Float64Array.of(0, 1, 2);
+    const arr = (v: number): Float64Array => Float64Array.of(v, v + 1, v + 2);
+    const csv = ensembleCsv(
+      scenario,
+      times,
+      { mean: arr(1), median: arr(2), q025: arr(0), q25: arr(1), q75: arr(3), q975: arr(4) },
+      '0.1.0',
+      'gillespie',
+    );
+    const lines = csv.trim().split('\n');
+    expect(lines.some((l) => l.includes('stochastic_method=gillespie'))).toBe(true);
+    expect(lines.some((l) => l.includes('seed=12345'))).toBe(true);
+    const head = lines.findIndex((l) => l.startsWith('day,'));
+    expect(lines[head]).toBe('day,I_mean,I_median,I_q025,I_q25,I_q75,I_q975');
+    expect(lines.slice(head + 1).length).toBe(3);
+    expect(lines[head + 2]).toBe('1,2,3,1,2,4,5');
+  });
+  it('fit CSV records the verdict, fixed vs fitted, posterior summaries and observed vs fitted rows', () => {
+    const csv = fitCsv(
+      {
+        label: 'demo',
+        modelLine: 'model=SEIR',
+        fixedFitted: ['fitted: r0, rho'],
+        converged: false,
+        seed: 7,
+        rows: [
+          {
+            day: 7,
+            date: '2024-01-07',
+            observed: 5,
+            expMedian: 4.5,
+            expLow: 3,
+            expHigh: 6,
+            predLow: 1,
+            predHigh: 9,
+          },
+          {
+            day: 14,
+            date: '',
+            observed: null,
+            expMedian: 8,
+            expLow: 5,
+            expHigh: 11,
+            predLow: 2,
+            predHigh: 15,
+          },
+        ],
+        parameters: [{ name: 'r0', median: 2.1, low: 1.8, high: 2.5, rhat: 1.2, ess: 50 }],
+      },
+      '0.1.0',
+    );
+    expect(csv).toContain('NOT CONVERGED - do not interpret');
+    expect(csv).toContain('# posterior r0: median=2.1 95%_interval=[1.8, 2.5] rhat=1.2 ess=50');
+    expect(csv).toContain('reported cases are not infections');
+    expect(csv).toContain('7,2024-01-07,5,4.5,3,6,1,9');
+    expect(csv).toContain('14,,,8,5,11,2,15');
   });
 });
 

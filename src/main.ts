@@ -5,6 +5,7 @@ import { renderAbout } from './ui/about';
 import { byId, h } from './ui/dom';
 import { renderExplainer } from './ui/explainer';
 import { History } from './ui/history';
+import { initFitView } from './ui/fitView';
 import { initSimulator } from './ui/simulator';
 import { ScenarioStore } from './ui/store';
 import { initTheme, toggleTheme } from './ui/theme';
@@ -35,6 +36,7 @@ function notify(message: string, kind: 'info' | 'error' = 'info'): void {
 }
 
 const sim = initSimulator(store, api, () => appInfo?.version ?? 'dev', notify);
+const fit = initFitView(api, notify, () => appInfo?.version ?? 'dev');
 
 /** Shows one view, renders it if it is generated, and marks its rail button as current. */
 function showView(id: ViewId, record = true): void {
@@ -72,6 +74,7 @@ function buildRail(): void {
 function onToggleTheme(): void {
   toggleTheme();
   sim.redraw();
+  fit.redraw();
 }
 
 /** Routes native menu actions and shortcuts. */
@@ -99,13 +102,14 @@ function onMenuAction(action: MenuAction): void {
       void sim.openScenarioFile();
       break;
     case 'file:export-csv':
-      void sim.exportCsv();
+      void (nav.value === 'fit' ? fit.exportCsv() : sim.exportCsv());
       break;
     case 'file:export-png':
-      void sim.exportPng();
+      void (nav.value === 'fit' ? fit.exportPng() : sim.exportPng());
       break;
     case 'file:open-csv':
-      notify('Importing case-count CSV files arrives with Fit mode.');
+      showView('fit');
+      void fit.openCsv();
       break;
   }
 }

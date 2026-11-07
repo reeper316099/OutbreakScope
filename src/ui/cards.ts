@@ -28,7 +28,7 @@ export function renderState<T>(
         // Keep the Cancel button in place while progress ticks, so it can always be clicked.
         existing.querySelector('progress')?.setAttribute('value', String(pct));
         const label = existing.querySelector('.progress-label');
-        if (label) label.textContent = `Running… ${pct}%`;
+        if (label) label.textContent = `${state.label ?? 'Running…'} ${pct}%`;
         break;
       }
       clear(container);
@@ -37,7 +37,7 @@ export function renderState<T>(
         h(
           'div',
           { class: 'state-note', 'data-state': 'running', role: 'status' },
-          h('span', { class: 'progress-label' }, `Running… ${pct}%`),
+          h('span', { class: 'progress-label' }, `${state.label ?? 'Running…'} ${pct}%`),
           bar,
           opts.onCancel ? cancelButton(opts.onCancel) : null,
         ),

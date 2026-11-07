@@ -613,3 +613,105 @@ progress {
 .rk4-svg svg {
   max-width: 640px;
 }
+
+/* ---- fit mode */
+.fit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.fit-grid .card,
+#view-fit .card {
+  max-width: none;
+}
+.honest-note {
+  background: var(--surface-2);
+  border-left: 5px solid var(--warn);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: 13.5px;
+}
+.problems {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0;
+  font-size: 13px;
+}
+.prob {
+  padding: 3px 8px;
+  border-left: 4px solid var(--border);
+  margin: 3px 0;
+}
+.prob-error {
+  border-left-color: var(--danger);
+}
+.prob-warning {
+  border-left-color: var(--warn);
+}
+.verdict {
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+.verdict.ok {
+  border: 2px solid var(--c-R);
+  background: rgb(0 158 115 / 12%);
+}
+.verdict.bad {
+  border: 2px solid var(--danger);
+  background: rgb(164 38 44 / 12%);
+}
+.verdict strong {
+  display: block;
+  font-size: 16px;
+}
+.hist-grid,
+.trace-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.mini-canvas {
+  width: 100%;
+  height: 190px;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.tiny-num {
+  width: 64px;
+}
+.param-table td,
+.param-table th {
+  text-align: left;
+  vertical-align: top;
+}
+td.good {
+  color: var(--c-R);
+  font-weight: 600;
+}
+td.bad-cell {
+  color: var(--danger);
+  font-weight: 700;
+}
+.unreliable .card {
+  opacity: 0.55;
+  outline: 2px dashed var(--danger);
+}
+.synthetic summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin: 6px 0;
+}
+.proj-controls {
+  margin: 8px 0;
+}
+.dataset-info {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 6px 12px;
+  margin: 8px 0;
+}

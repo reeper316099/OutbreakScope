@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "datasets": [
+    {
+      "id": "ut-flu-hosp-2024-25",
+      "title": "Utah: weekly new hospital admissions with confirmed influenza, 2024-25 season",
+      "file": "ut-flu-hosp-2024-25.csv",
+      "kind": "real",
+      "resolution": "weekly",
+      "dateColumn": "week_ending",
+      "countColumn": "new_admissions",
+      "measures": "Hospital admissions of patients with confirmed influenza (NOT infections, and not all infections lead to hospital admission)",
+      "populationHint": {
+        "value": 3271616,
+        "description": "Utah resident population, 2020 Census (not part of the dataset itself; shown only as a starting value for the model population)",
+        "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/apportionment/apportionment-2020-tableE.pdf"
+      },
+      "source": {
+        "name": "CDC National Healthcare Safety Network (NHSN): Weekly Hospital Respiratory Data (HRD) Metrics by Jurisdiction",
+        "url": "https://data.cdc.gov/d/ua7e-t2fy",
+        "retrieved": "2026-11-06",
+        "query": "jurisdiction = 'UT'; columns weekendingdate and totalconfflunewadm; weeks ending 2024-10-05 to 2025-06-28"
+      },
+      "license": {
+        "name": "Public Domain U.S. Government",
+        "termsUrl": "https://www.usa.gov/government-works",
+        "note": "License field of the dataset's metadata on data.cdc.gov. usa.gov states: \"Government work is something created by a U.S. government officer or employee as part of their official duties\" and cautions that \"Content on federal websites may include protected intellectual property used with the right holder's permission.\" The bundled file contains only aggregated weekly counts."
+      },
+      "citation": "Centers for Disease Control and Prevention, National Healthcare Safety Network. Weekly Hospital Respiratory Data (HRD) Metrics by Jurisdiction (data.cdc.gov dataset ua7e-t2fy), Utah, weeks ending 2024-10-05 to 2025-06-28. Accessed 2026-11-06.",
+      "transformation": "Selected two columns for Utah and a date window; the week-ending timestamp was shortened to YYYY-MM-DD; counts were converted from decimal text (for example 388.0) to integers. No value was changed, added or removed within the window.",
+      "caveats": [
+        "Counts are hospital admissions, not infections: only a small, changing share of influenza infections is hospitalised and tested.",
+        "Hospitals report with a lag after infection, and reporting rules changed over time (mandated, voluntary and mandated periods; see the source's notes).",
+        "Weekly totals around holidays can be unusually low or high (here, a sharp peak in the week ending 2025-01-04).",
+        "Real seasons are not single clean waves; a one-wave homogeneous model will fit only roughly.",
+        "The dataset is periodically revised by the source; this is the copy retrieved on the date above."
+      ],
+      "synthetic": null
+    },
+    {
+      "id": "ut-flu-hosp-2022-23",
+      "title": "Utah: weekly new hospital admissions with confirmed influenza, 2022-23 season (small counts)",
+      "file": "ut-flu-hosp-2022-23.csv",
+      "kind": "real",
+      "resolution": "weekly",
+      "dateColumn": "week_ending",
+      "countColumn": "new_admissions",
+      "measures": "Hospital admissions of patients with confirmed influenza (NOT infections)",
+      "populationHint": {
+        "value": 3271616,
+        "description": "Utah resident population, 2020 Census (not part of the dataset itself; shown only as a starting value for the model population)",
+        "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/apportionment/apportionment-2020-tableE.pdf"
+      },
+      "source": {
+        "name": "CDC National Healthcare Safety Network (NHSN): Weekly Hospital Respiratory Data (HRD) Metrics by Jurisdiction",
+        "url": "https://data.cdc.gov/d/ua7e-t2fy",
+        "retrieved": "2026-11-06",
+        "query": "jurisdiction = 'UT'; columns weekendingdate and totalconfflunewadm; weeks ending 2022-10-01 to 2023-03-25"
+      },
+      "license": {
+        "name": "Public Domain U.S. Government",
+        "termsUrl": "https://www.usa.gov/government-works",
+        "note": "License field of the dataset's metadata on data.cdc.gov. usa.gov states: \"Government work is something created by a U.S. government officer or employee as part of their official duties\" and cautions that \"Content on federal websites may include protected intellectual property used with the right holder's permission.\" The bundled file contains only aggregated weekly counts."
+      },
+      "citation": "Centers for Disease Control and Prevention, National Healthcare Safety Network. Weekly Hospital Respiratory Data (HRD) Metrics by Jurisdiction (data.cdc.gov dataset ua7e-t2fy), Utah, weeks ending 2022-10-01 to 2023-03-25. Accessed 2026-11-06.",
+      "transformation": "Selected two columns for Utah and a date window; the week-ending timestamp was shortened to YYYY-MM-DD; counts were converted from decimal text to integers. No value was changed, added or removed within the window.",
+      "caveats": [
+        "Counts are hospital admissions, not infections.",
+        "Counts are small (single digits to about 80 per week), so random noise is large; the negative-binomial option lets the model allow for extra scatter.",
+        "Reporting rules and hospital participation changed over time (see the source's notes).",
+        "Real seasons are not single clean waves; a one-wave homogeneous model will fit only roughly."
+      ],
+      "synthetic": null
+    },
+    {
+      "id": "synthetic-seir-weekly",
+      "title": "Synthetic weekly reported cases (made by OutbreakScope, not real data)",
+      "file": "synthetic-seir-weekly.csv",
+      "kind": "synthetic",
+      "resolution": "weekly",
+      "dateColumn": "day",
+      "countColumn": "reported_cases",
+      "measures": "Simulated reported cases from the SEIR model with Poisson noise",
+      "populationHint": null,
+      "source": null,
+      "license": null,
+      "citation": "Generated by OutbreakScope's own simulator and seeded random number generator (see the parameters in this entry). Not real data; no real outbreak is represented.",
+      "transformation": "Regenerated and compared against the file by the unit tests, so the file always matches the stated parameters and seed.",
+      "caveats": [
+        "The true values are known (R0 2.4, I0 15, reporting fraction 0.25, incubation 3 days, infectious period 5 days, N 1,000,000), so you can check whether a fit recovers them.",
+        "Because the data come from the same model that is fitted, this is the best case; real data are messier."
+      ],
+      "synthetic": {
+        "seed": 31,
+        "model": "SEIR",
+        "population": 1000000,
+        "r0": 2.4,
+        "i0": 15,
+        "rho": 0.25,
+        "incubationDays": 3,
+        "infectiousDays": 5,
+        "observations": 26,
+        "intervalDays": 7
+      }
+    }
+  ]
+}

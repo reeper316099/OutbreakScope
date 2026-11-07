@@ -220,7 +220,8 @@ test.describe('Scenario mode', () => {
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.setSize(1440, 900));
     await page.locator('#btn-add-contact').click();
     for (const theme of ['light', 'dark'] as const) {
-      await page.evaluate((t) => (document.documentElement.dataset['theme'] = t), theme);
+      if ((await page.evaluate(() => document.documentElement.dataset['theme'])) !== theme)
+        await page.locator('#btn-theme').click(); // use the real toggle so charts redraw
       await page.locator('#rail button[data-target="simulator"]').click();
       await page
         .locator('#btn-add-contact')

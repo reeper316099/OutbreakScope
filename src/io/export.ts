@@ -68,3 +68,53 @@ export function ensembleCsv(
   }
   return rows.join('\n') + '\n';
 }
+
+export interface FitCsvInput {
+  label: string;
+  modelLine: string;
+  fixedFitted: string[];
+  converged: boolean;
+  seed: number;
+  /** Observation end day (and calendar date if known), observed counts and predictive bands. */
+  rows: {
+    day: number;
+    date: string;
+    observed: number | null;
+    expMedian: number;
+    expLow: number;
+    expHigh: number;
+    predLow: number;
+    predHigh: number;
+  }[];
+  parameters: {
+    name: string;
+    median: number;
+    low: number;
+    high: number;
+    rhat: number;
+    ess: number;
+  }[];
+}
+
+/** Fit results as CSV: comment header (data label, model, fixed vs fitted, convergence verdict, seed, app version), then one row per interval. */
+export function fitCsv(input: FitCsvInput, appVersion: string): string {
+  const rows = [
+    `# OutbreakScope ${appVersion} fit export (teaching model, not a forecast; reported cases are not infections)`,
+    `# data=${input.label}`,
+    `# ${input.modelLine}`,
+    ...input.fixedFitted.map((l) => `# ${l}`),
+    `# diagnostics_verdict=${input.converged ? 'converged' : 'NOT CONVERGED - do not interpret'} seed=${input.seed}`,
+    ...input.parameters.map(
+      (p) =>
+        `# posterior ${p.name}: median=${num(p.median)} 95%_interval=[${num(p.low)}, ${num(p.high)}] rhat=${num(p.rhat)} ess=${num(p.ess)}`,
+    ),
+    'model_day,date,observed,expected_median,expected_q025,expected_q975,predicted_q025,predicted_q975',
+  ];
+  for (const r of input.rows)
+    rows.push(
+      [r.day, r.date, r.observed ?? '', r.expMedian, r.expLow, r.expHigh, r.predLow, r.predHigh]
+        .map((x) => (typeof x === 'number' ? num(x) : x))
+        .join(','),
+    );
+  return rows.join('\n') + '\n';
+}

@@ -86,7 +86,7 @@ export type PingResponse =
 /** UI state for any async panel. */
 export type TaskState<T> =
   | { status: 'idle' }
-  | { status: 'running'; progress: number }
+  | { status: 'running'; progress: number; label?: string }
   | { status: 'done'; result: T }
   | { status: 'cancelled' }
   | { status: 'error'; message: string };
@@ -209,5 +209,78 @@ export type EnsembleWorkerResponse =
       major: Uint8Array;
       extinct: Uint8Array;
       method: 'gillespie' | 'chain_binomial';
+    }
+  | { type: 'error'; jobId: number; message: string };
+
+// ---- Fit mode data types.
+
+/** A column of case counts ready for fitting. Model day 0 is the START of the first observation interval. */
+export interface ObservedSeries {
+  /** Human-readable name (file or dataset). */
+  label: string;
+  /** Observed counts (non-negative integers), one per observation. */
+  counts: number[];
+  /** Model day at the END of each observation interval (increasing). */
+  endDays: number[];
+  /** Length of one observation interval in days (1 = daily, 7 = weekly). */
+  intervalDays: 1 | 7;
+  /** Calendar date (YYYY-MM-DD) of each observation, or null when the file used row order. */
+  dates: string[] | null;
+}
+
+export type ProblemSeverity = 'error' | 'warning' | 'info';
+
+/** One finding from reading a data file. Rows are 1-based file line numbers (header = line 1). */
+export interface ImportProblem {
+  severity: ProblemSeverity;
+  /** File line number, or null for file-level problems. */
+  line: number | null;
+  message: string;
+}
+
+// ---- Fit workers.
+import type { FitConfig } from '../sim/fit';
+import type { FitRunOptions } from '../sim/fitRun';
+import type { MultiStartResult } from '../sim/optimize';
+
+/** Request to the optimiser worker (stage 1) or a chain worker (stage 2). */
+export type FitWorkerRequest =
+  | {
+      type: 'optimize';
+      jobId: number;
+      config: FitConfig;
+      series: ObservedSeries;
+      options: FitRunOptions;
+    }
+  | {
+      type: 'chain';
+      jobId: number;
+      config: FitConfig;
+      series: ObservedSeries;
+      options: FitRunOptions;
+      map: number[];
+      chainIndex: number;
+    };
+
+export type FitWorkerResponse =
+  | {
+      type: 'progress';
+      jobId: number;
+      stage: 'optimize' | 'chain';
+      chainIndex: number;
+      done: number;
+      total: number;
+    }
+  | { type: 'optimized'; jobId: number; result: MultiStartResult }
+  | {
+      type: 'chain';
+      jobId: number;
+      chainIndex: number;
+      dim: number;
+      samples: Float64Array;
+      logPosterior: Float64Array;
+      acceptRateBurnIn: number;
+      acceptRatePost: number;
+      adaptationIterations: number[];
     }
   | { type: 'error'; jobId: number; message: string };

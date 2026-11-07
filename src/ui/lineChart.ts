@@ -33,6 +33,12 @@ export interface SeriesDef {
   /** Dash pattern so colour is never the only signal (empty = solid). */
   dash: number[];
   width?: number;
+  /** Fill towards another dataset ('-1' = the previous one) to draw a band. */
+  fill?: string | false;
+  /** Draw only markers (observed data). */
+  pointsOnly?: boolean;
+  /** Leave out of the legend (band edges). */
+  hideLegend?: boolean;
   data: { x: number; y: number | null }[];
 }
 
@@ -147,12 +153,17 @@ export class LineChart {
     c.data.datasets = spec.datasets.map((s) => ({
       label: s.label,
       data: s.data,
-      borderColor: s.color,
-      backgroundColor: s.color,
+      borderColor: s.pointsOnly || s.fill ? (s.fill ? 'transparent' : s.color) : s.color,
+      backgroundColor: s.fill ? s.color : s.color,
       borderDash: s.dash,
-      borderWidth: s.width ?? 2,
+      borderWidth: s.pointsOnly ? 0 : (s.width ?? 2),
+      showLine: !s.pointsOnly,
+      pointRadius: s.pointsOnly ? 4 : 0,
+      pointHoverRadius: s.pointsOnly ? 6 : 4,
+      fill: s.fill ?? false,
       spanGaps: false,
     }));
+    const hidden = new Set(spec.datasets.flatMap((s, i) => (s.hideLegend ? [i] : [])));
     const fmt = (v: number): string =>
       spec.yFormat === 'percent'
         ? `${Number(v.toPrecision(3))}%`
@@ -179,7 +190,12 @@ export class LineChart {
     if (plugins) {
       plugins.legend = {
         position: 'top',
-        labels: { color: cssVar('--text'), usePointStyle: false, boxWidth: 36 },
+        labels: {
+          color: cssVar('--text'),
+          usePointStyle: false,
+          boxWidth: 36,
+          filter: (item) => !hidden.has(item.datasetIndex ?? -1),
+        },
       };
       plugins.tooltip = {
         callbacks: {

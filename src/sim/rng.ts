@@ -68,6 +68,7 @@ export function logFactorial(n: number): number {
 }
 
 export class Rng {
+  private spareNormal: number | null = null;
   private s0: number;
   private s1: number;
   private s2: number;
@@ -115,6 +116,56 @@ export class Rng {
     const hi = this.nextU32() >>> 5; // 27 bits
     const lo = this.nextU32() >>> 6; // 26 bits
     return (hi * 67108864 + lo) / 9007199254740992; // (hi * 2^26 + lo) / 2^53
+  }
+
+  /** Standard normal draw (Box-Muller; the second value of each pair is cached). */
+  normal(): number {
+    if (this.spareNormal !== null) {
+      const z = this.spareNormal;
+      this.spareNormal = null;
+      return z;
+    }
+    const r = Math.sqrt(-2 * Math.log(1 - this.nextFloat()));
+    const angle = 2 * Math.PI * this.nextFloat();
+    this.spareNormal = r * Math.sin(angle);
+    return r * Math.cos(angle);
+  }
+
+  /** Gamma(shape, scale 1) draw (Marsaglia-Tsang 2000; shape < 1 uses the boost Gamma(a) = Gamma(a+1) * U^(1/a)). */
+  gamma(shape: number): number {
+    if (!(shape > 0))
+      throw new ParamError('shape', 'out_of_range', 'Gamma shape must be positive.');
+    if (shape < 1) return this.gamma(shape + 1) * Math.pow(1 - this.nextFloat(), 1 / shape);
+    const d = shape - 1 / 3;
+    const c = 1 / Math.sqrt(9 * d);
+    for (;;) {
+      let x: number;
+      let v: number;
+      do {
+        x = this.normal();
+        v = 1 + c * x;
+      } while (v <= 0);
+      v = v * v * v;
+      const u = 1 - this.nextFloat();
+      if (u < 1 - 0.0331 * x * x * x * x || Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v)))
+        return d * v;
+    }
+  }
+
+  /** Poisson(mu) draw as Binomial(1e9, mu/1e9): exact up to a total-variation error below mu * 1e-9 (negligible; used for predictive simulation). */
+  poisson(mu: number): number {
+    if (!(mu >= 0) || !Number.isFinite(mu))
+      throw new ParamError('mu', 'out_of_range', 'Poisson mean must be finite and non-negative.');
+    if (mu === 0) return 0;
+    const n = 1_000_000_000;
+    return this.binomial(n, Math.min(1, mu / n));
+  }
+
+  /** Negative-binomial draw with mean mu and dispersion k (variance mu + mu^2/k) as a gamma-Poisson mixture. */
+  negativeBinomial(mu: number, k: number): number {
+    if (!(k > 0)) throw new ParamError('k', 'out_of_range', 'Dispersion must be positive.');
+    if (mu === 0) return 0;
+    return this.poisson(this.gamma(k) * (mu / k));
   }
 
   /** Exponential waiting time with the given rate (> 0): -ln(1 - U) / rate. */

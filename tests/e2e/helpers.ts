@@ -35,16 +35,16 @@ export async function stubDialogs(
   opts: { save?: string; open?: string },
 ): Promise<void> {
   await app.evaluate(({ dialog }, o) => {
-    dialog.showSaveDialog = (() =>
+    dialog.showSaveDialog = () =>
       Promise.resolve({
         canceled: o.save === undefined,
         filePath: o.save ?? '',
-      }));
-    dialog.showOpenDialog = (() =>
+      });
+    dialog.showOpenDialog = () =>
       Promise.resolve({
         canceled: o.open === undefined,
         filePaths: o.open === undefined ? [] : [o.open],
-      }));
+      });
   }, opts);
 }
 

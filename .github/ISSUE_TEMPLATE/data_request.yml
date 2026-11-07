@@ -1,0 +1,35 @@
+name: Preset or dataset
+description: Propose a new disease preset or a bundled sample dataset
+labels: [documentation, help wanted]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every preset and dataset needs a **real source** and a **license that allows redistribution**. Please do not paste values you cannot point to.
+  - type: input
+    id: what
+    attributes:
+      label: What is it?
+      description: Disease and place for a dataset, or disease and setting for a preset.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source (link, DOI or dataset id)
+    validations:
+      required: true
+  - type: input
+    id: license
+    attributes:
+      label: License
+      description: For example "Public Domain U.S. Government" or "CC BY 4.0".
+    validations:
+      required: true
+  - type: textarea
+    id: values
+    attributes:
+      label: Values and where they come from
+      description: Quote the numbers and the table or page they are from. Say if you derived anything.
+    validations:
+      required: true

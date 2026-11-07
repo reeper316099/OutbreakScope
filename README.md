@@ -4,6 +4,8 @@ An interactive infectious-disease outbreak simulator for the desktop (Windows, m
 
 > **Educational use only.** These are simplified teaching models, not forecasts. Do not use them for public-health decisions. Preset values are illustrative values from the literature, not predictions about any current outbreak.
 
+![OutbreakScope demo: move R0, add a contact-reduction intervention, run stochastic simulations, then fit the model to case counts](docs/demo.gif)
+
 | Scenario mode                                      | Stochastic runs                                      | Fit mode                                               |
 | -------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
 | ![Simulator](docs/screenshots/simulator-light.png) | ![Stochastic](docs/screenshots/stochastic-light.png) | ![Fit results](docs/screenshots/fit-results-light.png) |

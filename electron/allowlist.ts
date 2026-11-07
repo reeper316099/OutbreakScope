@@ -6,6 +6,7 @@ export const ALLOWED_EXTERNAL_HOSTS: ReadonlySet<string> = new Set([
   'pmc.ncbi.nlm.nih.gov',
   'pubmed.ncbi.nlm.nih.gov',
   'data.cdc.gov',
+  'www.cdc.gov',
 ]);
 
 /** True only for https URLs with no credentials whose host is exactly on the allowlist. */

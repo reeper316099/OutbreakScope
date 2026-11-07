@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { launchApp } from './helpers';
+import { launchApp, ready } from './helpers';
 
 test('shell launches, is locked down, and a worker runs under the CSP', async () => {
   const app = await launchApp();
-  const page = await app.firstWindow();
+  const page = await ready(app);
   const errors: string[] = [];
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push(m.text());

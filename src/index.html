@@ -10,35 +10,207 @@
   </head>
   <body>
     <div class="banner" role="note" id="disclaimer">
-      Teaching model, not a forecast. Simplified assumptions; do not use for public-health
-      decisions.
+      Teaching model, not a forecast. Simplified assumptions (everyone mixes equally, no age or
+      place); do not use for public-health decisions.
     </div>
-    <header class="topbar"><h1>OutbreakScope</h1></header>
+    <header class="topbar">
+      <h1>OutbreakScope</h1>
+      <div class="topbar-actions">
+        <button
+          type="button"
+          class="btn ghost"
+          id="btn-nav-back"
+          aria-label="Back to previous view"
+          title="Back (Alt+Left)"
+        >
+          ‹ Back
+        </button>
+        <button
+          type="button"
+          class="btn ghost"
+          id="btn-nav-forward"
+          aria-label="Forward to next view"
+          title="Forward (Alt+Right)"
+        >
+          Forward ›
+        </button>
+        <span class="sep" aria-hidden="true"></span>
+        <button
+          type="button"
+          class="btn ghost"
+          id="btn-undo"
+          aria-label="Undo last change"
+          title="Undo (Ctrl/Cmd+Z)"
+        >
+          Undo
+        </button>
+        <button
+          type="button"
+          class="btn ghost"
+          id="btn-redo"
+          aria-label="Redo"
+          title="Redo (Ctrl/Cmd+Shift+Z)"
+        >
+          Redo
+        </button>
+        <span class="sep" aria-hidden="true"></span>
+        <button
+          type="button"
+          class="btn ghost"
+          id="btn-theme"
+          aria-label="Toggle dark mode"
+          title="Toggle dark mode (Ctrl/Cmd+D)"
+        >
+          Dark mode
+        </button>
+      </div>
+    </header>
     <div class="layout">
       <nav class="rail" aria-label="Views" id="rail"></nav>
       <main id="views">
-        <section id="view-simulator" data-view="simulator" aria-labelledby="h-simulator">
-          <h2 id="h-simulator">Simulator</h2>
-          <p class="muted">Scenario mode arrives in Phase 4. This is the empty shell.</p>
-          <div class="card">
-            <h3>Shell self-checks</h3>
-            <ul class="checks" id="checks"></ul>
+        <section id="view-simulator" data-view="simulator" aria-label="Simulator">
+          <div class="sim-layout">
+            <aside class="panel controls" aria-label="Controls">
+              <div id="controls-main"></div>
+              <div id="timeline-root"></div>
+            </aside>
+            <div class="center">
+              <div id="sim-error" class="card error-card" role="alert" hidden></div>
+              <div id="sim-stage">
+                <div class="toolbar">
+                  <div role="tablist" aria-label="Charts" id="tablist" class="tabs"></div>
+                  <div class="view-opts">
+                    <label class="chk"
+                      ><input type="checkbox" id="opt-percent" /> Percent of population</label
+                    >
+                    <label class="chk"><input type="checkbox" id="opt-log" /> Log scale</label>
+                  </div>
+                </div>
+                <div class="chart-area">
+                  <div role="tabpanel" id="panel-compartments" aria-labelledby="tab-compartments">
+                    <div
+                      class="chart-opts"
+                      id="opt-compartments"
+                      aria-label="Compartments to show"
+                    ></div>
+                    <div class="chart-box">
+                      <canvas
+                        id="chart-main"
+                        aria-label="Compartment curves over time"
+                        role="img"
+                      ></canvas>
+                    </div>
+                    <div id="table-main"></div>
+                  </div>
+                  <div role="tabpanel" id="panel-incidence" aria-labelledby="tab-incidence" hidden>
+                    <div class="chart-opts">
+                      <label
+                        >Show
+                        <select id="inc-mode">
+                          <option value="daily">New infections per day</option>
+                          <option value="cumulative">Cumulative infections</option>
+                        </select></label
+                      >
+                    </div>
+                    <div class="chart-box">
+                      <canvas
+                        id="chart-inc"
+                        aria-label="New infections over time"
+                        role="img"
+                      ></canvas>
+                    </div>
+                    <div id="table-inc"></div>
+                  </div>
+                  <div role="tabpanel" id="panel-reff" aria-labelledby="tab-reff" hidden>
+                    <p class="small muted" id="reff-note"></p>
+                    <div class="chart-box">
+                      <canvas
+                        id="chart-reff"
+                        aria-label="Effective reproduction number over time"
+                        role="img"
+                      ></canvas>
+                    </div>
+                    <div id="table-reff"></div>
+                  </div>
+                  <div
+                    role="tabpanel"
+                    id="panel-stochastic"
+                    aria-labelledby="tab-stochastic"
+                    hidden
+                  >
+                    <div class="chart-opts">
+                      <button type="button" class="btn primary" id="btn-run">
+                        Run stochastic ensemble
+                      </button>
+                      <label
+                        >Show
+                        <select id="ens-series">
+                          <option value="I">Infectious people</option>
+                          <option value="cum">Cumulative infections</option>
+                        </select></label
+                      >
+                      <span class="small muted" id="ens-note"></span>
+                    </div>
+                    <div id="ens-state"></div>
+                    <div class="chart-box">
+                      <canvas
+                        id="chart-ens"
+                        aria-label="Stochastic realizations with median and bands"
+                        role="img"
+                      ></canvas>
+                    </div>
+                    <p class="small mono" id="ens-readout" aria-live="polite"></p>
+                    <div id="ens-fizzle"></div>
+                    <div id="table-ens"></div>
+                  </div>
+                  <div role="tabpanel" id="panel-compare" aria-labelledby="tab-compare" hidden>
+                    <div class="chart-opts">
+                      <span class="small muted">Save the current setup to compare it:</span>
+                      <span id="slot-buttons" class="row-gap"></span>
+                      <span id="overlay-toggles" class="row-gap"></span>
+                      <label
+                        >Compare against
+                        <select id="baseline-select"></select
+                      ></label>
+                    </div>
+                    <div class="chart-box short">
+                      <canvas
+                        id="chart-cmp"
+                        aria-label="Scenario comparison of infectious people over time"
+                        role="img"
+                      ></canvas>
+                    </div>
+                    <div id="compare-root"></div>
+                  </div>
+                </div>
+                <section id="results" class="results" aria-label="Key numbers">
+                  <h2>Key numbers</h2>
+                  <div id="results-body"></div>
+                </section>
+              </div>
+            </div>
           </div>
         </section>
-        <section id="view-explainer" data-view="explainer" hidden aria-labelledby="h-explainer">
-          <h2 id="h-explainer">How this works</h2>
-          <p class="muted">Coming in Phase 4.</p>
-        </section>
+        <section
+          id="view-explainer"
+          data-view="explainer"
+          hidden
+          aria-label="How this works"
+        ></section>
         <section id="view-fit" data-view="fit" hidden aria-labelledby="h-fit">
           <h2 id="h-fit">Fit to data</h2>
-          <p class="muted">Coming in Phase 5.</p>
+          <p class="muted">
+            Importing case counts and fitting the model arrives in the next milestone (Fit mode).
+          </p>
         </section>
-        <section id="view-about" data-view="about" hidden aria-labelledby="h-about">
-          <h2 id="h-about">About</h2>
-          <p class="muted" id="about-info"></p>
-        </section>
+        <section id="view-about" data-view="about" hidden aria-label="About"></section>
       </main>
     </div>
+    <footer class="statusbar">
+      <span id="status-seed" class="mono"></span>
+      <span id="toast" role="status" aria-live="polite"></span>
+    </footer>
+    <ul class="checks" id="checks" aria-label="Shell self-checks" hidden></ul>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

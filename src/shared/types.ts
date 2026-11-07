@@ -170,3 +170,44 @@ export interface Trajectory {
   /** Cumulative vaccinations of susceptibles. */
   cumVaccinated: Float64Array;
 }
+
+// ---- Scenario and ensemble types shared by the UI, workers and file IO.
+
+/** A complete, saveable description of one simulation setup. */
+export interface Scenario {
+  params: UserParams;
+  interventions: Intervention[];
+  /** PRNG seed (unsigned 32-bit integer) used by stochastic runs. */
+  seed: number;
+  /** Number of stochastic realizations. */
+  ensembleSize: number;
+}
+
+/** Which stochastic output series are sent back from workers. */
+export type EnsembleSeries = 'I' | 'cumInfections';
+
+/** Request to a stochastic worker: run realizations start..start+count-1 of the scenario. */
+export type EnsembleWorkerRequest = {
+  type: 'run';
+  jobId: number;
+  scenario: Scenario;
+  start: number;
+  count: number;
+};
+
+/** Worker replies (discriminated union). Arrays are flattened row-major: realization r, time k -> r*times.length + k. */
+export type EnsembleWorkerResponse =
+  | { type: 'progress'; jobId: number; done: number }
+  | {
+      type: 'result';
+      jobId: number;
+      start: number;
+      count: number;
+      times: Float64Array;
+      I: Float64Array;
+      cumInfections: Float64Array;
+      major: Uint8Array;
+      extinct: Uint8Array;
+      method: 'gillespie' | 'chain_binomial';
+    }
+  | { type: 'error'; jobId: number; message: string };

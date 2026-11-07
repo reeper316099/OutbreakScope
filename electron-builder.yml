@@ -1,0 +1,49 @@
+# Installer configuration. macOS and Windows builds are UNSIGNED (see README).
+appId: com.reeper316099.outbreakscope
+productName: OutbreakScope
+copyright: Copyright © 2026 reeper316099
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**/*
+  - datasets/**/*
+  - package.json
+  - LICENSE
+asar: true
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+publish:
+  provider: github
+  owner: reeper316099
+  repo: OutbreakScope
+  releaseType: release
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ${productName}-Setup-${version}-${arch}.${ext}
+portable:
+  artifactName: ${productName}-Portable-${version}-${arch}.${ext}
+mac:
+  icon: build/icon.icns
+  category: public.app-category.education
+  identity: null
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+linux:
+  icon: build/icon.png
+  category: Education
+  maintainer: reeper316099 <reeper316099@users.noreply.github.com>
+  synopsis: Interactive infectious-disease outbreak simulator (teaching models, not forecasts)
+  target:
+    - AppImage
+    - deb
+  artifactName: ${productName}-${version}-linux-${arch}.${ext}

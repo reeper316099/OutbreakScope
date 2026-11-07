@@ -1,6 +1,7 @@
 // About / limitations page: what the app is and is not, assumptions, sources, validation summary, licences.
 import type { AppInfo } from '../shared/types';
 import { PRESETS } from '../sim/presets';
+import { manifest } from './datasetFiles';
 import { clear, h } from './dom';
 import { ASSUMPTIONS } from './resultsPanel';
 
@@ -78,12 +79,36 @@ export function renderAbout(
     h(
       'section',
       { class: 'card ex', id: 'about-datasets' },
-      h('h3', {}, 'Datasets'),
+      h('h3', {}, 'Bundled sample datasets'),
       h(
         'p',
-        {},
-        'No datasets are bundled in this version. Sample datasets with sources and licences arrive with Fit mode; until then nothing is shown that cannot be traced to a source.',
+        { class: 'small muted' },
+        'Used only by Fit mode. Each is shown with its source, licence and caveats when selected. You can also import your own CSV file.',
       ),
+      manifest.ok
+        ? h(
+            'ul',
+            {},
+            ...manifest.datasets.map((d) =>
+              h(
+                'li',
+                {},
+                h('strong', {}, `${d.title}. `),
+                d.kind === 'synthetic' ? 'Synthetic (made by this app; not real data). ' : '',
+                ...(d.source
+                  ? [
+                      'Source: ',
+                      link(d.source.name, d.source.url, open),
+                      `, retrieved ${d.source.retrieved}. `,
+                    ]
+                  : []),
+                ...(d.license
+                  ? [`Licence: ${d.license.name} (`, link('terms', d.license.termsUrl, open), '). ']
+                  : []),
+              ),
+            ),
+          )
+        : h('p', { class: 'error-note' }, manifest.message),
     ),
     h(
       'section',
@@ -100,7 +125,7 @@ export function renderAbout(
         h(
           'li',
           {},
-          'RK4 convergence order measured at about 4 (halving the step cuts the error about 16×).',
+          'RK4 convergence order measured at 4.0–4.1 on a linear test problem and 3.8–3.9 on the nonlinear SIR system (halving the step cuts the error about 16×).',
         ),
         h(
           'li',
@@ -111,6 +136,16 @@ export function renderAbout(
           'li',
           {},
           'Final size matches the root of z = 1 − exp(−R0 z) to better than 1e-6; early SEIR growth matches the eigenvalue formula to 1e-4 (relative).',
+        ),
+        h(
+          'li',
+          {},
+          'Re-solving three scenarios exported from the app with SciPy (an independent implementation): the largest difference was 8.1e-10 of the population.',
+        ),
+        h(
+          'li',
+          {},
+          'Fitting: parameter recovery from synthetic data (95% intervals contained the true R0, I0 and reporting fraction in 6, 6 and 5 of 6 trials; all 6 fits converged); the MCMC sampler reproduces the mean, variance and correlation of known normal distributions; R-hat and effective sample size flag deliberately bad chains.',
         ),
         h(
           'li',

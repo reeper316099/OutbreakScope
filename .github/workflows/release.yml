@@ -1,0 +1,44 @@
+name: Release
+
+# Runs when a tag like v0.1.0 is pushed. Builds installers on all three systems and publishes them to the tag's GitHub Release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Build installers and publish them to the release
+        run: npx electron-builder --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false' # builds are unsigned on purpose
+
+  checksums:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add SHA256SUMS to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir assets
+          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --dir assets --pattern '*.exe' --pattern '*.dmg' --pattern '*.AppImage' --pattern '*.deb'
+          (cd assets && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+          gh release upload "$GITHUB_REF_NAME" assets/SHA256SUMS --repo "$GITHUB_REPOSITORY" --clobber

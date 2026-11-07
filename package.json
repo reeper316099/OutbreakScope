@@ -16,17 +16,17 @@
     "test:e2e": "npm run build && playwright test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "ref:generate": "python3 tools/gen_reference.py"
-  },
-  "dependencies": {
-    "chart.js": "4.6.1",
-    "zod": "4.6.7"
+    "ref:generate": "python3 tools/gen_reference.py",
+    "dist:dir": "npm run build && electron-builder --dir",
+    "icons": "electron tools/make-icons.cjs",
+    "crosscheck": "python3 -I tools/crosscheck.py"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.65.0",
     "@types/node": "24.19.2",
     "@vitest/coverage-v8": "5.1.0",
+    "chart.js": "4.6.1",
     "electron": "45.2.3",
     "electron-builder": "26.18.0",
     "electron-vite": "6.0.0",
@@ -36,6 +36,15 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.1",
     "vite": "8.3.6",
-    "vitest": "5.1.0"
+    "vitest": "5.1.0",
+    "zod": "4.6.7"
+  },
+  "homepage": "https://github.com/reeper316099/OutbreakScope#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reeper316099/OutbreakScope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/reeper316099/OutbreakScope/issues"
   }
 }

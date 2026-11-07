@@ -5,7 +5,9 @@
     "tests/**/*.ts",
     "src/sim/**/*.ts",
     "src/io/**/*.ts",
-    "src/shared/**/*.ts", "src/ui/history.ts",
+    "src/shared/**/*.ts",
+    "src/ui/history.ts",
+    "src/env.d.ts",
     "electron/allowlist.ts",
     "electron/appPath.ts"
   ]
